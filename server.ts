@@ -40,6 +40,19 @@ const deleteUpToStmt = db.prepare('DELETE FROM messages WHERE id <= ?')
 
 let lastSeenId = db.prepare<{ m: number | null }, []>('SELECT MAX(id) as m FROM messages').get()?.m ?? 0
 
+// CLI mode: `bun server.ts send <sender> <body>` writes directly to the DB.
+// Use this from cron jobs so the handler session's instance picks up the message.
+if (process.argv[2] === 'send') {
+  const sender = process.argv[3]
+  const body = process.argv.slice(4).join(' ')
+  if (!sender || !body) {
+    process.stderr.write('usage: bun server.ts send <sender> <body>\n')
+    process.exit(1)
+  }
+  insertStmt.run(sender, body)
+  process.exit(0)
+}
+
 const tools = [
   {
     name: 'send',
