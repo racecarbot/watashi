@@ -1,0 +1,5 @@
+watashi.db
+node_modules/
+bun.lock
+watashi.db-shm
+watashi.db-wal
